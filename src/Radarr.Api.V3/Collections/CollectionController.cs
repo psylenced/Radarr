@@ -84,9 +84,9 @@ namespace Radarr.Api.V3.Collections
                     collection.Monitored = resource.Monitored.Value;
                 }
 
-                if (resource.QualityProfileId.HasValue)
+                if (resource.QualityProfileIds != null && resource.QualityProfileIds.Any())
                 {
-                    collection.QualityProfileId = resource.QualityProfileId.Value;
+                    collection.QualityProfileIds = resource.QualityProfileIds;
                 }
 
                 if (resource.MinimumAvailability.HasValue)

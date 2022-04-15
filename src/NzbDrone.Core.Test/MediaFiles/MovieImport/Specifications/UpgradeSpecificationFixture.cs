@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using FizzWare.NBuilder;
 using FluentAssertions;
 using NUnit.Framework;
@@ -35,8 +36,7 @@ namespace NzbDrone.Core.Test.MediaFiles.MovieImport.Specifications
         [Test]
         public void should_return_true_if_no_existing_episodeFile()
         {
-            _localMovie.Movie.MovieFile = null;
-            _localMovie.Movie.MovieFileId = 0;
+            _localMovie.Movie.MovieFiles = new List<MovieFile> { };
 
             Subject.IsSatisfiedBy(_localMovie, null).Accepted.Should().BeTrue();
         }
@@ -44,12 +44,14 @@ namespace NzbDrone.Core.Test.MediaFiles.MovieImport.Specifications
         [Test]
         public void should_return_true_if_upgrade_for_existing_episodeFile()
         {
-            _localMovie.Movie.MovieFileId = 1;
-            _localMovie.Movie.MovieFile =
+            var movieFile =
                     new MovieFile
                     {
+                        Id = 1,
                         Quality = new QualityModel(Quality.SDTV, new Revision(version: 1))
                     };
+
+            _localMovie.Movie.MovieFiles = new List<MovieFile> { movieFile };
 
             Subject.IsSatisfiedBy(_localMovie, null).Accepted.Should().BeTrue();
         }
@@ -57,12 +59,14 @@ namespace NzbDrone.Core.Test.MediaFiles.MovieImport.Specifications
         [Test]
         public void should_return_false_if_not_an_upgrade_for_existing_episodeFile()
         {
-            _localMovie.Movie.MovieFileId = 1;
-            _localMovie.Movie.MovieFile =
+            var movieFile =
                 new MovieFile
                 {
+                    Id = 1,
                     Quality = new QualityModel(Quality.Bluray720p, new Revision(version: 1))
                 };
+
+            _localMovie.Movie.MovieFiles = new List<MovieFile> { movieFile };
 
             Subject.IsSatisfiedBy(_localMovie, null).Accepted.Should().BeFalse();
         }

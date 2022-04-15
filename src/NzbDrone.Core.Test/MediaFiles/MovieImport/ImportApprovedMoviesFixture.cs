@@ -115,20 +115,6 @@ namespace NzbDrone.Core.Test.MediaFiles.MovieImport
         }
 
         [Test]
-        public void should_only_import_each_movie_once()
-        {
-            GivenExistingFileOnDisk();
-
-            var all = new List<ImportDecision>();
-            all.AddRange(_approvedDecisions);
-            all.Add(new ImportDecision(_approvedDecisions.First().LocalMovie));
-
-            var result = Subject.Import(all, false);
-
-            result.Where(i => i.Result == ImportResultType.Imported).Should().HaveCount(_approvedDecisions.Count);
-        }
-
-        [Test]
         public void should_move_new_downloads()
         {
             Subject.Import(new List<ImportDecision> { _approvedDecisions.First() }, true);
@@ -235,34 +221,6 @@ namespace NzbDrone.Core.Test.MediaFiles.MovieImport
             Subject.Import(new List<ImportDecision> { _approvedDecisions.First() }, true);
 
             Mocker.GetMock<IMediaFileService>().Verify(v => v.Add(It.Is<MovieFile>(c => c.SceneName == null)));
-        }
-
-        [Test]
-        public void should_import_larger_files_first()
-        {
-            GivenExistingFileOnDisk();
-
-            var fileDecision = _approvedDecisions.First();
-            fileDecision.LocalMovie.Size = 1.Gigabytes();
-
-            var sampleDecision = new ImportDecision(
-                new LocalMovie
-                {
-                    Movie = fileDecision.LocalMovie.Movie,
-                    Path = @"C:\Test\TV\30 Rock\30 Rock - 2017 - Pilot.avi".AsOsAgnostic(),
-                    Quality = new QualityModel(),
-                    Size = 80.Megabytes()
-                });
-
-            var all = new List<ImportDecision>();
-            all.Add(fileDecision);
-            all.Add(sampleDecision);
-
-            var results = Subject.Import(all, false);
-
-            results.Should().HaveCount(all.Count);
-            results.Should().ContainSingle(d => d.Result == ImportResultType.Imported);
-            results.Should().ContainSingle(d => d.Result == ImportResultType.Imported && d.ImportDecision.LocalMovie.Size == fileDecision.LocalMovie.Size);
         }
 
         [Test]

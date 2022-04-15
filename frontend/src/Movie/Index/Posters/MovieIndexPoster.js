@@ -98,7 +98,7 @@ class MovieIndexPoster extends Component {
       showTitle,
       showMonitored,
       showQualityProfile,
-      qualityProfile,
+      qualityProfileIds,
       showSearchAction,
       showRelativeDates,
       shortDateFormat,
@@ -265,12 +265,12 @@ class MovieIndexPoster extends Component {
             </div>
         }
 
-        {
+        {/* {
           showQualityProfile &&
             <div className={styles.title}>
               {qualityProfile.name}
             </div>
-        }
+        } */}
 
         {
           showCinemaRelease && inCinemas &&
@@ -324,7 +324,7 @@ class MovieIndexPoster extends Component {
         }
 
         <MovieIndexPosterInfo
-          qualityProfile={qualityProfile}
+          qualityProfileIds={qualityProfileIds}
           showQualityProfile={showQualityProfile}
           showReleaseDate={showReleaseDate}
           showRelativeDates={showRelativeDates}
@@ -368,7 +368,7 @@ MovieIndexPoster.propTypes = {
   showTitle: PropTypes.bool.isRequired,
   showMonitored: PropTypes.bool.isRequired,
   showQualityProfile: PropTypes.bool.isRequired,
-  qualityProfile: PropTypes.object.isRequired,
+  qualityProfileIds: PropTypes.arrayOf(PropTypes.number).isRequired,
   showSearchAction: PropTypes.bool.isRequired,
   showRelativeDates: PropTypes.bool.isRequired,
   shortDateFormat: PropTypes.string.isRequired,

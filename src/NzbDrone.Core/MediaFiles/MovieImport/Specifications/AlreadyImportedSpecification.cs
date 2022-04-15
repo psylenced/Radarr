@@ -32,7 +32,7 @@ namespace NzbDrone.Core.MediaFiles.MovieImport.Specifications
 
             var movie = localMovie.Movie;
 
-            if (!movie.HasFile)
+            if (!movie.MovieFiles?.Value.Any() ?? true)
             {
                 _logger.Debug("Skipping already imported check for movie without file");
                 return Decision.Accept();
@@ -58,7 +58,7 @@ namespace NzbDrone.Core.MediaFiles.MovieImport.Specifications
             if (lastImported.DownloadId == downloadClientItem.DownloadId)
             {
                 _logger.Debug("Movie file previously imported at {0}", lastImported.Date);
-                return Decision.Reject("Movie file already imported at {0}", lastImported.Date);
+                return Decision.Reject(string.Format("Movie file already imported at {0}", lastImported.Date));
             }
 
             return Decision.Accept();

@@ -95,10 +95,11 @@ class MovieIndexOverview extends Component {
       isAvailable,
       status,
       titleSlug,
+      statistics,
       images,
       posterWidth,
       posterHeight,
-      qualityProfile,
+      qualityProfileIds,
       overviewOptions,
       showSearchAction,
       showRelativeDates,
@@ -118,6 +119,10 @@ class MovieIndexOverview extends Component {
       queueState,
       ...otherProps
     } = this.props;
+
+    const {
+      sizeOnDisk
+    } = statistics;
 
     const {
       isEditMovieModalOpen,
@@ -248,11 +253,12 @@ class MovieIndexOverview extends Component {
               <MovieIndexOverviewInfo
                 height={overviewHeight}
                 monitored={monitored}
-                qualityProfile={qualityProfile}
+                qualityProfileIds={qualityProfileIds}
                 showRelativeDates={showRelativeDates}
                 shortDateFormat={shortDateFormat}
                 longDateFormat={longDateFormat}
                 timeFormat={timeFormat}
+                sizeOnDisk={sizeOnDisk}
                 {...overviewOptions}
                 {...otherProps}
               />
@@ -286,11 +292,12 @@ MovieIndexOverview.propTypes = {
   isAvailable: PropTypes.bool.isRequired,
   status: PropTypes.string.isRequired,
   titleSlug: PropTypes.string.isRequired,
+  statistics: PropTypes.object.isRequired,
   images: PropTypes.arrayOf(PropTypes.object).isRequired,
   posterWidth: PropTypes.number.isRequired,
   posterHeight: PropTypes.number.isRequired,
   rowHeight: PropTypes.number.isRequired,
-  qualityProfile: PropTypes.object.isRequired,
+  qualityProfileIds: PropTypes.arrayOf(PropTypes.number).isRequired,
   overviewOptions: PropTypes.object.isRequired,
   showSearchAction: PropTypes.bool.isRequired,
   showRelativeDates: PropTypes.bool.isRequired,
@@ -310,6 +317,12 @@ MovieIndexOverview.propTypes = {
   youTubeTrailerId: PropTypes.string,
   queueStatus: PropTypes.string,
   queueState: PropTypes.string
+};
+
+MovieIndexOverview.defaultProps = {
+  statistics: {
+    movieFileCount: 0
+  }
 };
 
 export default MovieIndexOverview;

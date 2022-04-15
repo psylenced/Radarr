@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using NLog;
 using NzbDrone.Common.Extensions;
 using NzbDrone.Core.IndexerSearch.Definitions;
@@ -20,42 +21,48 @@ namespace NzbDrone.Core.DecisionEngine.Specifications
         public SpecificationPriority Priority => SpecificationPriority.Database;
         public RejectionType Type => RejectionType.Permanent;
 
-        public Decision IsSatisfiedBy(RemoteMovie subject, SearchCriteriaBase searchCriteria)
+        public IEnumerable<Decision> IsSatisfiedBy(RemoteMovie subject, SearchCriteriaBase searchCriteria)
+        {
+            return new List<Decision> { Calculate(subject, searchCriteria) };
+        }
+
+        private Decision Calculate(RemoteMovie subject, SearchCriteriaBase searchCriteria)
         {
             if (!subject.ParsedMovieInfo.Quality.Revision.IsRepack)
             {
                 return Decision.Accept();
             }
 
-            if (subject.Movie.MovieFileId != 0)
+            if (subject.Movie.MovieFiles.Value.Count > 0)
             {
-                var file = subject.Movie.MovieFile;
-
-                if (_upgradableSpecification.IsRevisionUpgrade(file.Quality, subject.ParsedMovieInfo.Quality))
+                foreach (var file in subject.Movie.MovieFiles.Value)
                 {
-                    var releaseGroup = subject.ParsedMovieInfo.ReleaseGroup;
-                    var fileReleaseGroup = file.ReleaseGroup;
-
-                    if (fileReleaseGroup.IsNullOrWhiteSpace())
+                    if (_upgradableSpecification.IsRevisionUpgrade(file.Quality, subject.ParsedMovieInfo.Quality))
                     {
-                        return Decision.Reject("Unable to determine release group for the existing file");
-                    }
+                        var releaseGroup = subject.ParsedMovieInfo.ReleaseGroup;
+                        var fileReleaseGroup = file.ReleaseGroup;
 
-                    if (releaseGroup.IsNullOrWhiteSpace())
-                    {
-                        return Decision.Reject("Unable to determine release group for this release");
-                    }
+                        if (fileReleaseGroup.IsNullOrWhiteSpace())
+                        {
+                            return Decision.Reject("Unable to determine release group for the existing file");
+                        }
 
-                    if (!fileReleaseGroup.Equals(releaseGroup, StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        _logger.Debug(
-                            "Release is a repack for a different release group. Release Group: {0}. File release group: {1}",
-                            releaseGroup,
-                            fileReleaseGroup);
-                        return Decision.Reject(
-                            "Release is a repack for a different release group. Release Group: {0}. File release group: {1}",
-                            releaseGroup,
-                            fileReleaseGroup);
+                        if (releaseGroup.IsNullOrWhiteSpace())
+                        {
+                            return Decision.Reject("Unable to determine release group for this release");
+                        }
+
+                        if (!fileReleaseGroup.Equals(releaseGroup, StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            _logger.Debug(
+                                "Release is a repack for a different release group. Release Group: {0}. File release group: {1}",
+                                releaseGroup,
+                                fileReleaseGroup);
+                            return Decision.Reject(
+                                string.Format("Release is a repack for a different release group. Release Group: {0}. File release group: {1}",
+                                releaseGroup,
+                                fileReleaseGroup));
+                        }
                     }
                 }
             }

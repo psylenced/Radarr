@@ -55,14 +55,19 @@ class DeleteMovieModalContent extends Component {
       title,
       path,
       hasFile,
-      sizeOnDisk,
+      statistics,
       onModalClose
     } = this.props;
+
+    const {
+      sizeOnDisk,
+      movieFileCount
+    } = statistics;
 
     const deleteFiles = this.state.deleteFiles;
     const addImportExclusion = this.state.addImportExclusion;
 
-    let deleteFilesLabel = hasFile ? translate('DeleteFileLabel', [1]) : translate('DeleteFilesLabel', [0]);
+    let deleteFilesLabel = movieFileCount === 1 ? translate('DeleteFileLabel', [1]) : translate('DeleteFilesLabel', [movieFileCount]);
     let deleteFilesHelpText = translate('DeleteFilesHelpText');
 
     if (!hasFile) {
@@ -155,9 +160,15 @@ DeleteMovieModalContent.propTypes = {
   title: PropTypes.string.isRequired,
   path: PropTypes.string.isRequired,
   hasFile: PropTypes.bool.isRequired,
-  sizeOnDisk: PropTypes.number.isRequired,
+  statistics: PropTypes.object.isRequired,
   onDeletePress: PropTypes.func.isRequired,
   onModalClose: PropTypes.func.isRequired
+};
+
+DeleteMovieModalContent.defaultProps = {
+  statistics: {
+    movieFileCount: 0
+  }
 };
 
 export default DeleteMovieModalContent;
